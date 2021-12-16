@@ -346,16 +346,57 @@ def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google
             try:
                 word_vectors.append(google_model[w])
             except KeyError:
+                if w == "polici":
+                    replaced_word = "policy"
+                elif w == "slaveri":
+                    replaced_word = "slavery"
+                elif w == "revolutionari":
+                    replaced_word = "revolutionary"
+                elif w == "violenc":
+                    replaced_word = "violence"
+                elif w == "bolsheviki":
+                    replaced_word = "Bolshevik"
+                elif w == "sabotag":
+                    replaced_word = "sabotage"
+                elif w == "repris":
+                    replaced_word = "reprisal"
+                elif w == "retali":
+                    replaced_word = "retaliate"
+                elif w == "subvers":
+                    replaced_word = "subversion"
                 try:
-                    word_vectors.append(google_model[w.capitalize()])
+                    position = total_similar_words.index(w)
+                    total_similar_words[position] = replaced_word
+                    word_vectors.append(google_model[replaced_word])
                 except KeyError:
-                    total_similar_words.remove(w)
-                    print(w, "has been removed from similar words")
+                    try:
+                        word_vectors.append(google_model[w.capitalize()])
+                    except KeyError:
+                            print(f"cannot find {w} in Google Model")
+                            if input("Do you wnat to replace this word? (Y/N): ") == ("Y"|"y"|"yes"|"Yes"):
+                                replaced_word = input("Please type in the word you want to repleace: ")
+                                position = total_similar_words.index(w)
+                                total_similar_words[position] = replaced_word
+                                word_vectors.append(google_model[replaced_word])
+                            else:
+                                position = total_similar_words.index(w)
+                                total_similar_words[position] = keyword
+                                word_vectors.append(google_model[keyword])
+                                print(f"{w} has been replaced with {keyword}")
     else:
-        word_vectors = [model_1961_1980.wv[w] for w in total_similar_words]
+        word_vectors = []
+        for k in total_similar_words:
+            try:
+                word_vectors.append(model_1961_1980.wv[k])
+            except KeyError:
+                try:
+                    word_vectors.append(model_1961_1980.wv[k.capitalize()])
+                except KeyError:
+                    position = total_similar_words.index(k)
+                    total_similar_words[position] = keyword
+                    word_vectors.append(model_1961_1980.wv[keyword])
+                    print(f"{k} has been replaced with {keyword}")
 
-
-        
     
     import plotly
     import plotly.graph_objs as go
@@ -365,12 +406,14 @@ def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google
     topn = topn_number
     ##############  
     
-    
-    word_vectors.append(model_1851_1900.wv[keyword])
-    word_vectors.append(model_1901_1930.wv[keyword])
-    word_vectors.append(model_1931_1950.wv[keyword])
-    word_vectors.append(model_1951_1960.wv[keyword])
-    word_vectors.append(model_1961_1980.wv[keyword])
+    try:
+        word_vectors.append(model_1851_1900.wv[keyword])
+        word_vectors.append(model_1901_1930.wv[keyword])
+        word_vectors.append(model_1931_1950.wv[keyword])
+        word_vectors.append(model_1951_1960.wv[keyword])
+        word_vectors.append(model_1961_1980.wv[keyword])
+    except KeyError:
+        pass
     
     word_vectors = np.array(word_vectors)
     
@@ -406,7 +449,7 @@ def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google
                     marker = {
                         'size': 8,
                         'opacity': 0.8,
-                        'color': "gray"
+                        'color': 2
                     }
        
                 )
@@ -464,7 +507,7 @@ def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google
     plot_figure.write_image(filename)
     plot_figure.show()
 
-def word2vec_visual_cluster(keyword, topn_number, filename, stem = True, google_background = False):
+def word2vec_visual_cluster(keyword, topn_number, filename, stem = True):
     import numpy as np
     import pickle
     the_path = "C:/Users/tosea/NYT_API/"

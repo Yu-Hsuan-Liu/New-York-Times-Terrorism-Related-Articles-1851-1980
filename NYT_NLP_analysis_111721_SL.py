@@ -116,6 +116,63 @@ result_1931_1950_terrorist = top_similar_words(my_pd, 1931, 1950, "terrorist", t
 result_1951_1960_terrorist = top_similar_words(my_pd, 1951, 1960, "terrorist", the_path)
 result_1961_1980_terrorist = top_similar_words(my_pd, 1961, 1980, "terrorist", the_path)
 
+
+result_1851_1900_klan = top_similar_words(my_pd, 1851, 1900, "klan", the_path)
+result_1901_1930_klan = top_similar_words(my_pd, 1901, 1930, "klan", the_path)
+result_1931_1950_klan = top_similar_words(my_pd, 1931, 1950, "klan", the_path)
+result_1951_1960_klan = top_similar_words(my_pd, 1951, 1960, "klan", the_path)
+result_1961_1980_klan = top_similar_words(my_pd, 1961, 1980, "klan", the_path)
+
+result_1851_1900_gue = top_similar_words(my_pd, 1851, 1900, "guerrilla", the_path)
+result_1901_1930_gue = top_similar_words(my_pd, 1901, 1930, "guerrilla", the_path)
+result_1931_1950_gue = top_similar_words(my_pd, 1931, 1950, "guerrilla", the_path)
+result_1951_1960_gue = top_similar_words(my_pd, 1951, 1960, "guerrilla", the_path)
+result_1961_1980_gue = top_similar_words(my_pd, 1961, 1980, "guerrilla", the_path)
+
+result_1851_1900_anarchist = top_similar_words(my_pd, 1851, 1900, "anarchist", the_path)
+result_1901_1930_anarchist = top_similar_words(my_pd, 1901, 1930, "anarchist", the_path)
+result_1931_1950_anarchist = top_similar_words(my_pd, 1931, 1950, "anarchist", the_path)
+result_1951_1960_anarchist = top_similar_words(my_pd, 1951, 1960, "anarchist", the_path)
+result_1961_1980_anarchist = top_similar_words(my_pd, 1961, 1980, "anarchist", the_path)
+
+print([i for i in result_1851_1900_klan.klan_stm])
+print([i for i in result_1901_1930_klan.klan_stm])
+print([i for i in result_1931_1950_klan.klan_stm])
+print([i for i in result_1951_1960_klan.klan_stm])
+print([i for i in result_1961_1980_klan.klan_stm])
+
+[print(i) for i in result_1851_1900_klan.klan_dict]
+[print(i) for i in result_1901_1930_klan.klan_dict]
+[print(i) for i in result_1931_1950_klan.klan_dict]
+[print(i) for i in result_1951_1960_klan.klan_dict]
+[print(i) for i in result_1961_1980_klan.klan_dict]
+
+print([i for i in result_1851_1900_gue.guerrilla_stm])
+print([i for i in result_1901_1930_gue.guerrilla_stm])
+print([i for i in result_1931_1950_gue.guerrilla_stm])
+print([i for i in result_1951_1960_gue.guerrilla_stm])
+print([i for i in result_1961_1980_gue.guerrilla_stm])
+
+print([i for i in result_1851_1900_anarchist.anarchist_stm])
+print([i for i in result_1901_1930_anarchist.anarchist_stm])
+print([i for i in result_1931_1950_anarchist.anarchist_stm])
+print([i for i in result_1951_1960_anarchist.anarchist_stm])
+print([i for i in result_1961_1980_anarchist.anarchist_stm])
+
+print([i for i in result_1851_1900_anarchist.anarchist_dict])
+print([i for i in result_1901_1930_anarchist.anarchist_dict])
+print([i for i in result_1931_1950_anarchist.anarchist_dict])
+print([i for i in result_1951_1960_anarchist.anarchist_dict])
+print([i for i in result_1961_1980_anarchist.anarchist_dict])
+
+
+import nltk
+dictionary = nltk.corpus.words.words("en")
+"ku klux klan"  in dictionary
+
+from nltk.stem.porter import PorterStemmer
+stemmer = PorterStemmer()
+stemmer.stem("anarchist") 
 '''
 print_numbers = 50
 
@@ -161,15 +218,7 @@ sample_text = ""
 my_pred, my_pred_score = score_text(sample_text, the_path)
 
 # Google Model similarity
-from gensim.models import KeyedVectors
-the_path_in = "C:/Users/tosea/NLP@Columbia/GOOGLEVECTORS/"
-google_model = KeyedVectors.load_word2vec_format(the_path_in + "GoogleNews-vectors-negative300.bin.gz", binary=True) 
 
-
-
-
-google_terrorist_list = [i[0] for i in google_model.most_similar("terrorist", topn = 15)]
-google_terrorist_list
 
 def my_vec_fun(df_in, m, n, path_o):
     from sklearn.feature_extraction.text import CountVectorizer
