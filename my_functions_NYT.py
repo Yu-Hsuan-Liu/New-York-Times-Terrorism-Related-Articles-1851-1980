@@ -55,8 +55,8 @@ def check_dictionary(var):
 
 
 def check_additional_sw(var):
-    additional_sw = ["new", "work", "time", "permiss", "one", "would", 
-                     "two", "men", "man", "three", "year", "work", "span",
+    additional_sw = ["new", "work", "time", "permiss", "one", "would", "the", "The",
+                     "two", "three", "year", "work", "span",
                      "r", "e", "p", "copyright", "index", "n", "a", "b", "c",
                      "d", "f", "g", "h", "i", "j","k","l","m","n","o","q",
                      "s","t","u","v","w",'x','y','z', "said", "could", "upon",
@@ -64,11 +64,11 @@ def check_additional_sw(var):
                      "even","New", "York", "Times", "copyright", "said", "would", "one" ,"two", "year", "mr", "added", "including", "years",
                       "monday", "see", "make", "three", "since", "say", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
                      "made", "want", "many", "without", "need", "get", "way", "through", "whether", "next", "used", "saying", "going",
-                     "even", "month", "week", "president", "trump", "led", "also", "Trump", "go", "man", "men", "still", "told", "may",
+                     "even", "month", "week", "president",  "led", "also",  "go", "man", "men", "still", "told", "may",
                   "back", "like", "news", "people", "take", "never", "often", "every", "though", "later", "recent", "use", "could", "much",
                  "last", "around", "put", "away", "began", "left", "four", "five", "six", "seven", "eight", "nine", "ten", "good", "months",
                  "accross", "others", "first", "second", "third", "ms", "already", "long", "known", "wrote", "among", "asked", "accross",
-                 "according", "might", "high", "Obama", "obama", "Obama", "yesterday", "today", "tomorrow", "american", "government", "state",
+                 "according", "might", "high", "Obama", "obama", "Obama", "yesterday", "today", "tomorrow", "american",  "state",
                  "along", "must", "went", "little", "nan", "published", "oe", "te", "mrs",
                  "e", "ay", "te", "ta", "et", "ad", "however", "other", "another", "en", "os",
                  "ar", "shall", "less", "more", "great", "well", "large", "old", "yet", "nothing",
@@ -103,6 +103,9 @@ def stem_fun(var):
     tmp_txt = [stemmer.stem(word) for word in var.split()]
     tmp_txt = ' '.join(tmp_txt)
     return tmp_txt
+from nltk.stem.porter import PorterStemmer
+stemmer = PorterStemmer()
+stemmer.stem("politicians")
 
 def give_year_labels(df):
     import numpy as np
@@ -180,7 +183,7 @@ def cosine_fun(df_a, df_b, label_in):
     cos_matrix_t.columns = label_in
     return cos_matrix_t
 
-def extract_embeddings_domain(df_in, num_vec_in, path_in, filename):
+def extract_embeddings_domain(df_in, num_vec_in, path_in, filename, sg):
     #domain specific, train out own model specific to our domains
     from gensim.models import Word2Vec
     #import pandas as pd
@@ -189,7 +192,7 @@ def extract_embeddings_domain(df_in, num_vec_in, path_in, filename):
 
     model = Word2Vec(
         df_in.str.split(), min_count=1,
-        vector_size=num_vec_in, workers=3, window=5, sg=0)
+        vector_size=num_vec_in, workers=3, window=5, sg=sg)
     #wrd_dict = model.wv.key_to_index
     #model.wv.most_similar('machine', topn=10)
     # def get_score(var):
@@ -295,33 +298,33 @@ def display_pca_scatterplot(model, words=None, sample=0):
         plt.text(x+0.05, y+0.05, word)
 
 
-def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google_background = False):
+def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google_background = False, sg = 0):
     the_path = "C:/Users/tosea/NYT_API/"
     import pickle
     import numpy as np
     topn_number = topn_number
     if stem == True:
         model_1851_1900  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1851_1900_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_stem_1851_1900_embeddings_domain_model{sg}.pkl", 'rb'))
         model_1901_1930  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1901_1930_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_stem_1901_1930_embeddings_domain_model{sg}.pkl", 'rb'))
         model_1931_1950  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1931_1950_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_stem_1931_1950_embeddings_domain_model{sg}.pkl", 'rb'))
         model_1951_1960  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1951_1960_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_stem_1951_1960_embeddings_domain_model{sg}.pkl", 'rb'))
         model_1961_1980  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1961_1980_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_stem_1961_1980_embeddings_domain_model{sg}.pkl", 'rb'))
     else:
         model_1851_1900  = pickle.load(open(
-            the_path + "clean_sw_dict_1851_1900_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_1851_1900_embeddings_domain_model{sg}.pkl", 'rb'))
         model_1901_1930  = pickle.load(open(
-            the_path + "clean_sw_dict_1901_1930_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_1901_1930_embeddings_domain_model{sg}.pkl", 'rb'))
         model_1931_1950  = pickle.load(open(
-            the_path + "clean_sw_dict_1931_1950_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_1931_1950_embeddings_domain_model{sg}.pkl", 'rb'))
         model_1951_1960  = pickle.load(open(
-            the_path + "clean_sw_dict_1951_1960_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_1951_1960_embeddings_domain_model{sg}.pkl", 'rb'))
         model_1961_1980  = pickle.load(open(
-            the_path + "clean_sw_dict_1961_1980_embeddings_domain_model.pkl", 'rb'))
+            the_path + f"clean_sw_dict_1961_1980_embeddings_domain_model{sg}.pkl", 'rb'))
     
     models = [model_1851_1900, model_1901_1930, 
               model_1931_1950, model_1951_1960,
@@ -346,43 +349,162 @@ def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google
             try:
                 word_vectors.append(google_model[w])
             except KeyError:
-                if w == "polici":
-                    replaced_word = "policy"
-                elif w == "slaveri":
-                    replaced_word = "slavery"
-                elif w == "revolutionari":
-                    replaced_word = "revolutionary"
-                elif w == "violenc":
-                    replaced_word = "violence"
-                elif w == "bolsheviki":
-                    replaced_word = "Bolshevik"
-                elif w == "sabotag":
-                    replaced_word = "sabotage"
-                elif w == "repris":
-                    replaced_word = "reprisal"
-                elif w == "retali":
-                    replaced_word = "retaliate"
-                elif w == "subvers":
-                    replaced_word = "subversion"
                 try:
-                    position = total_similar_words.index(w)
-                    total_similar_words[position] = replaced_word
-                    word_vectors.append(google_model[replaced_word])
+                    word_vectors.append(google_model[w.capitalize()])
                 except KeyError:
-                    try:
-                        word_vectors.append(google_model[w.capitalize()])
-                    except KeyError:
-                            print(f"cannot find {w} in Google Model")
-                            if input("Do you wnat to replace this word? (Y/N): ") == ("Y"|"y"|"yes"|"Yes"):
-                                replaced_word = input("Please type in the word you want to repleace: ")
-                                position = total_similar_words.index(w)
-                                total_similar_words[position] = replaced_word
-                                word_vectors.append(google_model[replaced_word])
-                            else:
-                                position = total_similar_words.index(w)
-                                total_similar_words[position] = keyword
-                                word_vectors.append(google_model[keyword])
-                                print(f"{w} has been replaced with {keyword}")
+                         
+                    if w == "polici":
+                        replaced_word = "policy"
+                        position = total_similar_words.index(w)
+                        total_similar_words[position] = replaced_word
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "slaveri":
+                        replaced_word = "slavery"
+                        position = total_similar_words.index(w)
+                        total_similar_words[position] = replaced_word
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "revolutionari":
+                        replaced_word = "revolutionary"
+                        position = total_similar_words.index(w)
+                        total_similar_words[position] = replaced_word
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "violenc":
+                        replaced_word = "violence"
+                        position = total_similar_words.index(w)
+                        total_similar_words[position] = replaced_word
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "bolsheviki":
+                        replaced_word = "Bolshevik"
+                        position = total_similar_words.index(w)
+                        total_similar_words[position] = replaced_word
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "sabotag":
+                        replaced_word = "sabotage"
+                        position = total_similar_words.index(w)
+                        total_similar_words[position] = replaced_word
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "repris":
+                        replaced_word = "reprisal"
+                        position = total_similar_words.index(w)
+                        total_similar_words[position] = replaced_word
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "retali":
+                        replaced_word = "retaliate"
+                        position = total_similar_words.index(w)
+                        total_similar_words[position] = replaced_word
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "subvers":
+                        replaced_word = "subversion"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "constitut":
+                        replaced_word = "constitute"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "everi":
+                        replaced_word = "every"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "declar":
+                        replaced_word = "declare"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "seizur":
+                        replaced_word = "seizure"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "massacr":
+                        replaced_word = "massacre"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "massacr":
+                        replaced_word = "massacre"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "intimid":
+                        replaced_word = "intimidate"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "wholesal":
+                        replaced_word = "wholesale"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "bloodsh":
+                        replaced_word = "bloodshed"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "incit":
+                        replaced_word = "incite"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "unsympath":
+                        replaced_word = "unsympathetic"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "renegad":
+                        replaced_word = "renegade"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "openli":
+                        replaced_word = "openly"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "pillag":
+                        replaced_word = "pillage"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "insurrect":
+                        replaced_word = "insurrection"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "systemat":
+                        replaced_word = "systematic"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "attribut":
+                        replaced_word = "attribute"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "bridl":
+                        replaced_word = "bridle"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "infiltr":
+                        replaced_word = "infiltrate"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "outrag":
+                        replaced_word = "outrage"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "antimilitari":
+                        replaced_word = "antimilitary"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "snuggeri":
+                        replaced_word = "snuggery"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "sequestr":
+                        replaced_word = "sequestration"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    elif w == "riotou":
+                        replaced_word = "riotous"
+                        position = total_similar_words.index(w)
+                        word_vectors.append(google_model[replaced_word])
+                    else:
+                        print(f"cannot find {w} in Google Model")
+                        if input("Do you wnat to replace this word? (Y/N): ") == ("Y"):
+                            replaced_word = input("Please type in the word you want to repleace: ")
+                            position = total_similar_words.index(w)
+                            total_similar_words[position] = replaced_word
+                            word_vectors.append(google_model[replaced_word])
+                        else:
+                            position = total_similar_words.index(w)
+                            total_similar_words[position] = keyword
+                            word_vectors.append(google_model[keyword])
+                            print(f"{w} has been replaced with {keyword}")
     else:
         word_vectors = []
         for k in total_similar_words:
@@ -504,10 +626,10 @@ def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google
     
     
     plot_figure = go.Figure(data = data, layout = layout)
-    plot_figure.write_image(filename)
+    plot_figure.write_image(filename+str(sg)+".png")
     plot_figure.show()
 
-def word2vec_visual_cluster(keyword, topn_number, filename, stem = True):
+def word2vec_visual_cluster(keyword, topn_number, filename, stem = True, sg = 0):
     import numpy as np
     import pickle
     the_path = "C:/Users/tosea/NYT_API/"
@@ -665,12 +787,17 @@ def word2vec_visual_cluster(keyword, topn_number, filename, stem = True):
     
     
     plot_figure = go.Figure(data = data, layout = layout)
-    plot_figure.write_image(filename)
+    plot_figure.write_image(filename+str(sg)+".png")
     plot_figure.show()
     
     
     
 def score_text(sample_text_i, the_path_i):
+    import sys
+    import warnings
+    
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
     #Classify arbitrary text, need to run ALL same pre-processing and 
     #transformation steps as what was applied to the training set
     #Step 1 call; up clean_text function
@@ -689,4 +816,5 @@ def score_text(sample_text_i, the_path_i):
     print ("sample_text predicted as", the_pred[0],
            "with likelihood of", the_pred_proba)
     return the_pred, the_pred_proba
+
 
