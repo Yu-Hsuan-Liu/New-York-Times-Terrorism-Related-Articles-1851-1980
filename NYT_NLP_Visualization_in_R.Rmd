@@ -1,0 +1,480 @@
+---
+title: "NYT News Text NLP Visualization"
+author: "Yu-Hsuan Liu"
+date: "April 1st, 2022"
+output:
+  pdf_document:
+    keep_tex: yes
+  html_document:
+    df_print: paged
+  word_document: default
+header-includes:
+- \usepackage{pdflscape}
+- \usepackage{caption}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+
+---
+
+```{r, results='hide', message=FALSE, warning = FALSE, echo = F}
+
+library(dplyr)
+library(xtable)
+library(prettyR)
+library(ggplot2)
+library(tidyr)
+library(grid)
+library(gridExtra)
+library(stargazer)
+library(haven)
+library(tidyverse)
+library(stringr)
+library(kableExtra)
+library(lubridate)
+library(scales)
+library(patchwork) # To display 2 charts together
+library(tidytext)    # For neat text things
+library(gutenbergr)  # For downloading books from Project Gutenberg
+library(hrbrthemes)
+library(foreign)
+library(plm)
+library(forcats)
+library(gtable)
+
+options(knitr.table.format = "html") 
+options(knitr.kable.NA = '')
+knitr::opts_chunk$set(cache = TRUE)
+options(xtable.comment = FALSE)
+
+```
+
+
+```{r, results = "asis", message=FALSE, warning = FALSE, echo = FALSE}
+desc_table <- read.csv("des_nyt_table.csv")
+colnames(desc_table) <- c("Years", "Number of Articles", "Number of Tokens")
+desc_table$`Number of Articles` <- comma(desc_table$`Number of Articles`)
+desc_table$`Number of Tokens` <- comma(desc_table$`Number of Tokens`)
+
+
+
+## if latex ##
+desc_table %>%
+  kable(booktabs = T, align = "crrr", format = "latex", longtable = T, escape = F) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F) %>% 
+  kable_classic(full_width = F) 
+
+## if html ##
+#desc_table %>%
+#  kable(booktabs = T, align = "crrr", format = "html", longtable = T, escape = F) %>%
+#  kable_styling(bootstrap_options = "striped", full_width = F) %>% 
+#  kable_classic(full_width = F, html_font = "Times New Roman") %>%  save_kable(file = "table1.html", self_contained = T)
+
+```
+
+
+```{r,  message=FALSE, warning = FALSE, echo = FALSE}
+pb_1851_1900 <- read.csv("probability_1851_1900.csv") %>% mutate(Years = "1851-1900")
+pb_1901_1930 <- read.csv("probability_1901_1930.csv") %>% mutate(Years = "1901-1930")
+pb_1931_1950 <- read.csv("probability_1931_1950.csv") %>% mutate(Years = "1931-1950")
+pb_1951_1960 <- read.csv("probability_1951_1960.csv") %>% mutate(Years = "1951-1960")
+pb_1961_1980 <- read.csv("probability_1961_1980.csv") %>% mutate(Years = "1961-1980")
+
+prob_df <- rbind(pb_1851_1900, pb_1901_1930, pb_1931_1950,pb_1951_1960,pb_1961_1980)
+
+```
+
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+makePlot <- function(df, colours, xbreaks){
+  
+  df %>%
+    mutate(name1 = fct_reorder(token, raw_frequency)) %>%
+    ggplot()+
+      geom_col(aes(x=raw_frequency, y=name1, fill= Years), colour = "white") +
+      scale_fill_manual(values = colours) +
+      #calculate the total frequency in order to calculate the probability
+      scale_x_continuous(sec.axis = sec_axis(~ ./mean(df$raw_frequency/df$probability...), 
+                                             labels = scales::number_format(accuracy = 0.1),
+                                             breaks = xbreaks/mean(df$raw_frequency/df$probability...))
+                         ,breaks = xbreaks
+                         ) +
+    theme(axis.text.y = element_text(size = 7))  
+}
+
+```
+
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+p <- makePlot(pb_1851_1900, "#F8766D", c(500,850))
+p2 <- makePlot(pb_1901_1930, "#BB9D00", c(600,1500))
+p3 <- makePlot(pb_1931_1950, "#00B81F", c(1000,4000))
+p4 <- makePlot(pb_1951_1960, "#00A5FF", c(500, 2300))
+p5 <- makePlot(pb_1961_1980, "#E76BF3", c(4000, 15000))
+
+```
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+
+leg1 <- ggplot(prob_df, aes(x=raw_frequency, y=token,fill=Years)) + geom_col() + 
+  theme(legend.position="top",legend.spacing.x = unit(0.45, 'cm'))
+
+get_legend<-function(myggplot){
+  tmp <- ggplot_gtable(ggplot_build(myggplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
+
+my_leg <- get_legend(leg1)
+```
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE, results= "hide"}
+figure2 <- grid.arrange(my_leg, textGrob("Probability (%)"), label = textGrob("Tokens", rot = 90),
+             p+ theme(legend.position = "none")+ labs(x = NULL, y = NULL), 
+             p2+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             p3+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             p4+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             p5+ theme(legend.position = "none")+ labs(x = NULL, y = NULL), 
+             textGrob("Frequency"),
+             layout_matrix = rbind(c(1,1,1,1,1,1),c(2,2,2,2,2,2), c(3,4,5,6,7,8), c(9,9,9,9,9,9)),
+        ncol=6, nrow=4, widths=c(1,10,10,10,10,10), heights=c(0.2, 0.2, 2,  0.2))
+ggsave(file="figure2.png", figure2)
+dev.off()
+```
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+#Skip-Ngram Word2vec Models
+simi_skgm_1851_1900 <- read.csv("result_1851_1900_terrorist.csv") %>% 
+  mutate(Years = "1851-1900")
+simi_skgm_1901_1930 <- read.csv("result_1901_1930_terrorist.csv") %>% 
+  mutate(Years = "1901-1930")
+simi_skgm_1931_1950 <- read.csv("result_1931_1950_terrorist.csv") %>% 
+  mutate(Years = "1931-1950")
+simi_skgm_1951_1960 <- read.csv("result_1951_1960_terrorist.csv") %>% 
+  mutate(Years = "1951-1960")
+simi_skgm_1961_1980 <- read.csv("result_1961_1980_terrorist.csv") %>%
+  mutate(Years = "1961-1980")
+
+
+#CBOW Word2Vec Models
+simi_cbow_1851_1900 <- read.csv("result_1851_1900_terrorist_0.csv") %>% 
+  mutate(Years = "1851-1900")
+simi_cbow_1901_1930 <- read.csv("result_1901_1930_terrorist_0.csv") %>% 
+  mutate(Years = "1901-1930")
+simi_cbow_1931_1950 <- read.csv("result_1931_1950_terrorist_0.csv") %>% 
+  mutate(Years = "1931-1950")
+simi_cbow_1951_1960 <- read.csv("result_1951_1960_terrorist_0.csv") %>% 
+  mutate(Years = "1951-1960")
+simi_cbow_1961_1980 <- read.csv("result_1961_1980_terrorist_0.csv") %>%
+  mutate(Years = "1961-1980")
+
+```
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+makePlot_simi <- function(df, colours, xbreaks, x_lims){
+  head(df, 25) %>%
+    mutate(name1 = fct_reorder(terrorist_stm, terrorist_Values_stm)) %>%
+    ggplot()+
+      geom_col(aes(x=terrorist_Values_stm, y=name1, fill= Years), colour = "white") +
+      scale_fill_manual(values = colours) +
+      scale_x_continuous(labels = scales::number_format(accuracy = 0.1),
+                         breaks = xbreaks
+                         ) + labs(x = NULL, y = NULL)+ 
+    #sub the tokens that are too long to make the graph looks ugly
+  scale_y_discrete(labels=function(name1) sub(
+    "urban_guerrilla", "urban_\nguerrilla", sub(
+    "guerrilla_organ", "guerrilla_\norgan", sub(
+    "croatian_serbian", "croatian_\nserbian", sub(
+    "extremist_organ", "extremist_\norgan", sub(
+    "extremist_group", "extremist_\ngroup", sub(
+    "respons_abduct", "respons_\nabduct", sub(
+    "soon_afterward", "soon_\nafterward", sub(
+    "croatian_nationalist", "croatian_\nnationalist", sub(
+    "campaign_terror", "campaign_\nterror", sub(
+    "underground_organ", "underground_\norgan", sub(
+    "haganah_underground", "haganah_\nunderground", sub(
+      "resist_movement", "resist_\nmovement", name1))))))))))))) +
+    coord_cartesian(xlim = x_lims) +
+    theme(axis.text.y = element_text(size = 5.5))  
+}
+```
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+skgm1 <- makePlot_simi(simi_skgm_1851_1900, "#F8766D", c(0.5,0.7,0.9), c(0.5, 0.9))
+skgm2 <- makePlot_simi(simi_skgm_1901_1930, "#BB9D00", c(0.5,0.7,0.9), c(0.5, 0.9)) 
+skgm3 <- makePlot_simi(simi_skgm_1931_1950, "#00B81F", c(0.5,0.7,0.9), c(0.5, 0.9))
+skgm4 <- makePlot_simi(simi_skgm_1951_1960, "#00A5FF", c(0.5,0.7,0.9), c(0.5, 0.9))
+skgm5 <- makePlot_simi(simi_skgm_1961_1980, "#E76BF3", c(0.5,0.7,0.9), c(0.5, 0.9))
+
+```
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE, results = "hide"}
+figure3 <- grid.arrange(label = my_leg, textGrob("Tokens", rot = 90),
+             skgm1+ theme(legend.position = "none")+ labs(x = NULL, y = NULL), 
+             skgm2+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             skgm3+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             skgm4+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             skgm5+ theme(legend.position = "none")+ labs(x = NULL, y = NULL), 
+             textGrob("Similarity Score"),
+             layout_matrix = rbind(c(1,1,1,1,1,1), c(2,3,4,5,6,7), c(8,8,8,8,8,8)),
+        ncol=6, nrow=3, widths=c(1,10,10,10,10,10), heights=c(0.2, 2, 0.2))
+ggsave(file="figure3.png",figure3)
+dev.off()
+
+```
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+cbow1 <- makePlot_simi(simi_cbow_1851_1900, "#F8766D", c(0.5,0.7, 0.9), c(0.5, 0.9))
+cbow2 <- makePlot_simi(simi_cbow_1901_1930, "#BB9D00", c(0.5,0.7, 0.9), c(0.5, 0.9))
+cbow3 <- makePlot_simi(simi_cbow_1931_1950, "#00B81F", c(0.5,0.7, 0.9), c(0.5, 0.9))
+cbow4 <- makePlot_simi(simi_cbow_1951_1960, "#00A5FF", c(0.5,0.7, 0.9), c(0.5, 0.9))
+cbow5 <- makePlot_simi(simi_cbow_1961_1980, "#E76BF3", c(0.5, 0.7, 0.9), c(0.5, 0.9))
+
+```
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE, results = "hide"}
+figure4 <- grid.arrange(label = my_leg, textGrob("Tokens", rot = 90),
+             cbow1+ theme(legend.position = "none")+ labs(x = NULL, y = NULL), 
+             cbow2+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             cbow3+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             cbow4+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             cbow5+ theme(legend.position = "none")+ labs(x = NULL, y = NULL), 
+             textGrob("Similarity Score"),
+             layout_matrix = rbind(c(1,1,1,1,1,1),c(2,3,4,5,6,7), c(8,8,8,8,8,8)),
+        ncol=6, nrow=3, widths=c(1,10,10,10,10,10), heights=c(0.2, 2, 0.2))
+ggsave(file="figure4.png", figure4)
+dev.off()
+```
+
+
+```{r,  results = "asis", message=FALSE, warning = FALSE, echo = FALSE} 
+#, results = "asis" ## for latex only...
+
+#Similarity tables between different historical sections
+jac_table_1 =  read.csv("jac_table_1.csv")
+tf_idf_table_1 =  read.csv("tf_idf_table_1.csv")
+jac_table_0 =  read.csv("jac_table_0.csv")
+tf_idf_table_0 =  read.csv("tf_idf_table_0.csv")
+years = c("1851-1900", "1901-1930", "1931-1950", "1951-1960", "1961-1980")
+total_x <- round(rbind(jac_table_1, tf_idf_table_1, jac_table_0, tf_idf_table_0), 3)
+names(total_x) <- years
+Years_for_row <- c("1851-1900", "1901-1930", "1931-1950", "1951-1960", "1961-1980",
+                   "1851-1900", "1901-1930", "1931-1950", "1951-1960", "1961-1980",
+                   "1851-1900", "1901-1930", "1931-1950", "1951-1960", "1961-1980",
+                   "1851-1900", "1901-1930", "1931-1950", "1951-1960", "1961-1980")
+total_x <- cbind(Years_for_row, total_x)
+
+similarity_in_similarity_table <- kbl(total_x, booktabs = T, 
+                                align = "ccccccc", format = "latex",
+                                escape = F, longtable = T,
+                                digits = 3,
+                                caption = 'Jaccard Similarity and TF-IDF Similarity of Top 100 Similar Words to "terrorist" Across the Five Historical Periods',
+                                col.names = c("Years", 
+                                              "1851-1900", 
+                                              "1901-1930", 
+                                              "1931-1950", 
+                                              "1951-1960", 
+                                              "1961-1980"))%>%
+  kable_styling(position = "center", latex_options = c("hold_position", "striped", 
+                                                       "scale_down")) %>%
+  pack_rows("Jaccard Similarity, SKNG Model", 1, 5) %>%
+  pack_rows("TF-IDF Similarity, SKNG Model", 6, 10) %>%
+  pack_rows("Jaccard Similarity, CBOW Model", 11, 15) %>%
+  pack_rows("TF-IDF Similarity, CBOW Model", 16, 20) %>%
+  footnote(number = c("TESTTESTTEST"),  footnote_as_chunk = T) 
+print(similarity_in_similarity_table)
+#%>%  cat(., file = "Table2.html")
+
+
+#kableExtra::row_spec(similarity_in_similarity_table, 20, extra_css = "border-bottom: 1px solid")
+
+#readr::write_file(demo_final_table, "kable_out.html")
+
+
+#print(similarity_in_similarity_table)
+```
+
+
+```{r, results = "asis", message=FALSE, warning = FALSE, echo = FALSE}
+x1 = xtable(jac_table_1, digits=3,  caption = 'Jaccard Similarity of Top 100 Similar Words to "terrorist", SKNG Model')
+names(x1) <- years
+#print(x1, caption.placement = "top")
+
+x2 = xtable(tf_idf_table_1, digits=3, caption = 'TF-IDF Similarity of Top 100 Similar Words to "terrorist", SKNG Model')
+names(x2) <- years
+#print(x2, caption.placement = "top")
+
+x3 = xtable(jac_table_0, digits=3, caption = 'Jaccard Similarity of Top 100 Similar Words to "terrorist", CBOW Model')
+names(x3) <- years
+#print(x3, caption.placement = "top")
+
+x4 = xtable(tf_idf_table_0, digits=3, caption = 'TF-IDF Similarity of Top 100 Similar Words to "terrorist", CBOW Model')
+names(x4) <- years
+#print(x4, caption.placement = "top")
+
+```
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+#visual similar words
+total_similar_score <- read.csv("simi_total.csv")
+
+total_similar_score <- total_similar_score %>% 
+  group_by(terrorist_stm) %>%
+  mutate(count = n()) %>%
+  mutate(simi_score = mean(terrorist_Values_stm))
+total_similar_score <- total_similar_score[total_similar_score$count >= 3, ]
+total_similar_score
+#extract top_100_simi_words_counts_over_three
+x <- c()
+
+for (i in total_similar_score[order(-total_similar_score$count, -total_similar_score$simi_score), ]$terrorist_stm) {
+  if(!(i %in% x) == TRUE){ x <- append(x, i)}
+}
+
+
+write.csv(x, "top_100_simi_words_counts_over_three.csv")
+
+```
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE, fig.height = 10, fig.width = 7, results = "hide"}
+library(RColorBrewer)
+
+figure5 <- ggplot(total_similar_score, 
+            #reorder, by counts and the similar_score
+           aes(y = fct_reorder(terrorist_stm, (count+simi_score), .desc = F))) +
+      geom_bar(aes(fill = Years), position = position_stack(reverse = TRUE)) +
+      theme(legend.position = "right") + 
+      labs(title = 'Top 100 Similar Words to "terrorist" Counts Over Three Times\nwithin the Five Historical Periods(Summed from both SKNG & CBOW Models)', 
+           x = "Counts", 
+           y = 'Top 100 similar words to "terrorist" over three times within the five historical periods') +
+      scale_x_continuous(labels = scales::number_format(accuracy = 1),
+                         breaks = c(1,3,5,7,9)) + 
+      #use paried color
+      scale_fill_brewer(palette = "Paired")
+```
+
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE, fig.height = 10, fig.width = 7, results = "hide"}
+print(figure5)
+ggsave(file="figure5.png", figure5)
+dev.off()
+```
+
+```{r,  message=FALSE, warning = FALSE, echo = FALSE}
+topic_table_topics <- str_replace_all(str_replace_all(read.csv("topic_table.csv")[, 4], "\"",""),",",", ")
+topic_table_years <-  str_replace_all(read.csv("topic_table.csv")[, 2], "_", "-")
+topic_table_k <-  str_replace_all(read.csv("topic_table.csv")[,3], "_", "-")
+topic_table_distri <- round(read.csv("topic_table.csv", )[, 5] * 100, 2)
+
+
+rapoport <- linebreak(c(rep("Anarchist Wave", 1),
+                        "Anti-Colonial Wave", " ","Anarchist Wave",
+                        rep("Anti-Colonial Wave", 3), 
+                        "Anti-Colonial Wave",
+                        rep("New Left Wave",2)), align = "l")
+hoffman <- linebreak(c(" ", rep("Government abusing power",3), 
+                       "Self-determination waves","National liberation","Revolutionary in WWII",
+                       "Liberation battles\nNationalism and separatism",
+                       rep("Destabalize the West", 2)), align = "l")
+topic_table <- cbind(topic_table_years, rapoport, hoffman,  topic_table_k, topic_table_topics, topic_table_distri) 
+
+#reorder the row
+topic_table <- topic_table[order(topic_table_years, -topic_table_distri),]
+
+```
+
+\newpage
+\blandscape
+
+```{r,  results = "asis", message=FALSE, warning = FALSE, echo = FALSE} 
+
+topic_table_x <- kable(topic_table, booktabs = T, 
+                                align = "lllllc", format = "latex",
+                                escape = F, longtable = T, 
+                                caption = 'Result of LDA Topic Modeling',
+                                col.names = c("Historical Periods",
+                                              "Rapoport (2001; 2004)",
+                                              "Hoffman (2006)",
+                                              "k",
+                                              "LDA Topic Words", 
+                                              "Topic Distribution (\\%)"
+                                              ))%>% 
+  footnote(number = c("TESTTESTTEST"),  footnote_as_chunk = T) %>% 
+  kable_styling(latex_options="scale_down", font_size = 8) %>%
+  collapse_rows(columns = 1:5, valign = "top", latex_hline = "major", target = 1)
+  #pack_rows("1851-1900", 1, 1) %>%
+  #pack_rows("1901-1930", 2, 3) %>%
+  #pack_rows("1931-1950", 4, 7) %>%
+  #pack_rows("1951-1960", 8, 10) %>%
+  #pack_rows("1961-1980", 11, 13) %>%
+
+print(topic_table_x, row.names = FALSE)
+```
+
+
+\elandscape
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+
+simi_klux <- read.csv("simi_klux.csv")
+simi_klux <- simi_klux %>% separate(Years, c("Years","Models"), " ")
+simi_klux_skng <-  simi_klux %>% subset(Models=="SKNG")
+simi_klux_cbow <-  simi_klux %>% subset(Models=="CBOW")
+
+#get top 25 in each group and give orders
+simi_klux_skng <- simi_klux_skng %>% 
+  group_by(Years) %>% 
+  slice_max(order_by = klux_Values_stm, n = 25)
+```
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+makePlot_klux_simi <- function(df, colours, breaks, xlim){
+  head(df, 25) %>%
+    mutate(name1 = fct_reorder(klux_stm, klux_Values_stm)) %>%
+    ggplot()+
+      geom_col(aes(x=klux_Values_stm, y=name1, fill= Years), colour = "white") +
+      scale_fill_manual(values = colours) +
+      scale_x_continuous(labels = scales::number_format(accuracy = 0.1),
+                         breaks = breaks
+                         )+ labs(x = NULL, y = NULL)+ 
+  scale_y_discrete(labels=function(name1) sub("counterrevolutionari",
+               "counter-\nrevolutionari", name1)) +
+  
+    
+    coord_cartesian(xlim = xlim) +
+    theme(axis.text.y = element_text(size = 6))  
+}
+
+```
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE}
+klux_skgm1 <- makePlot_klux_simi(simi_klux_skng %>% subset(Years == "1851-1900"), "#F8766D", c(0.6, 0.8, 1), c(0.6, 1)) 
+klux_skgm2 <- makePlot_klux_simi(simi_klux_skng %>% subset(Years == "1901-1930"), "#BB9D00", c(0.6, 0.8, 1), c(0.6, 1))
+klux_skgm3 <- makePlot_klux_simi(simi_klux_skng %>% subset(Years == "1931-1950"), "#00B81F", c(0.6, 0.8, 1), c(0.6, 1))
+klux_skgm4 <- makePlot_klux_simi(simi_klux_skng %>% subset(Years == "1951-1960"), "#00A5FF", c(0.6, 0.8, 1), c(0.6, 1))
+klux_skgm5 <- makePlot_klux_simi(simi_klux_skng %>% subset(Years == "1961-1980"), "#E76BF3", c(0.6, 0.8, 1), c(0.6, 1))
+
+
+figure6 <- grid.arrange(label = textGrob("Tokens", rot = 90),
+             klux_skgm1+ theme(legend.position = "none")+ labs(x = NULL, y = NULL), 
+             klux_skgm2+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             klux_skgm3+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             klux_skgm4+ theme(legend.position = "none")+ labs(x = NULL, y = NULL),
+             klux_skgm5+ theme(legend.position = "none")+ labs(x = NULL, y = NULL), 
+             textGrob("Similarity Score"),
+             my_leg,  
+             layout_matrix = rbind(c(1,2,3,4,5,6),c(7,7,7,7,7,7), c(8,8,8,8,8,8)),
+        ncol=6, nrow=3, widths=c(1,10,10,10,10,10), heights=c(2, 0.2, 0.2))
+ggsave(file="figure6.png", figure6)
+dev.off()
+```
+
+

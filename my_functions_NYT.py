@@ -47,36 +47,80 @@ def rem_sw(var):
 
 def check_dictionary(var):
     import nltk
+    import re
     dictionary = nltk.corpus.words.words("en")
-    fin_txt = [word for word in var.split() if word in dictionary]
+    fin_txt = []
+    for word in var.split():
+        #check dictionary will filter out the word "klux" but we would like to keep it 
+        #as "klan" because "ku klux klan" is an very important idea/word/phrase 
+        #in the context of terrorim acts.
+        #in order to keep it as a stemming process, all terms related to klux, such as 
+        #kuklux or  kukluxism will be appended as "klan"
+        if ((word.lower() == "klux")|
+            (word.lower() == "kukluxism")|
+            (word.lower() == "kuklu")|
+            (word.lower() == "kukiu")|
+            (word.lower() == "kutlux")|
+            (word.lower() == "klansman")):
+            fin_txt.append("klan")
+        elif (word in dictionary):
+            fin_txt.append(word.lower())
+        
     fin_txt = ' '.join(fin_txt)
+    #"klux klan" will become "klan klan", so we just want keep one "klan" at a time
+    #fin_txt = re.sub("klan klan", "klan", fin_txt)
     return fin_txt
 
+def fetch_bi_grams(var):
+    import numpy as np
+    import pandas as pd
+    #import pdb
+    from gensim.models import Phrases
+    from gensim.models.phrases import Phraser
+    sentence_stream = np.array(var)
+    #pdb.set_trace()
+    bigram = Phrases(sentence_stream, min_count=3, threshold=10, delimiter="_")
+    trigram = Phrases(bigram[sentence_stream], min_count=3, threshold=10)
+    bigram_phraser = Phraser(bigram)
+    trigram_phraser = Phraser(trigram)
+    bi_grams = list()
+    tri_grams = list()
+    for sent in sentence_stream:
+        bi_grams.append(bigram_phraser[sent])
+        tri_grams.append(trigram_phraser[sent])
+    return bi_grams,  tri_grams
+
+
+def num_tokens(var):
+    n = len(var.split())
+    return n
 
 
 def check_additional_sw(var):
-    additional_sw = ["new", "work", "time", "permiss", "one", "would", "the", "The",
-                     "two", "three", "year", "work", "span",
+    additional_sw = ["new", "de","work", "time", "permiss", "one", "would", "the", "The",
+                     "two", "three", "year", "work", "span", "man", "men",
                      "r", "e", "p", "copyright", "index", "n", "a", "b", "c",
                      "d", "f", "g", "h", "i", "j","k","l","m","n","o","q",
-                     "s","t","u","v","w",'x','y','z', "said", "could", "upon",
+                     "s","t","u","v","w",'x','y','z', "said", "could", "upon", "ist",
                      "may", "without", "made", "make", "through", "saying",
                      "even","New", "York", "Times", "copyright", "said", "would", "one" ,"two", "year", "mr", "added", "including", "years",
                       "monday", "see", "make", "three", "since", "say", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
                      "made", "want", "many", "without", "need", "get", "way", "through", "whether", "next", "used", "saying", "going",
-                     "even", "month", "week", "president",  "led", "also",  "go", "man", "men", "still", "told", "may",
+                     "even", "month", "week", "led", "also",  "go",  "still", "told", "may",
                   "back", "like", "news", "people", "take", "never", "often", "every", "though", "later", "recent", "use", "could", "much",
                  "last", "around", "put", "away", "began", "left", "four", "five", "six", "seven", "eight", "nine", "ten", "good", "months",
                  "accross", "others", "first", "second", "third", "ms", "already", "long", "known", "wrote", "among", "asked", "accross",
-                 "according", "might", "high", "Obama", "obama", "Obama", "yesterday", "today", "tomorrow", "american",  "state",
-                 "along", "must", "went", "little", "nan", "published", "oe", "te", "mrs",
+                 "according", "might", "high", "yesterday", "today", "tomorrow",  "state",
+                 "along", "must", "went", "little", "nan", "published", "oe", "mrs",
                  "e", "ay", "te", "ta", "et", "ad", "however", "other", "another", "en", "os",
                  "ar", "shall", "less", "more", "great", "well", "large", "old", "yet", "nothing",
                  "work", "upon", "several", "whose", "matter", "es", "ever", "almost",
                  "know",  "ago", "cannot", "thing", "cause", "no", "yes", "er", 
                  "span", "index", "newspapers", "1923", "current", "reproduction", "reproduced", "1923current", "newyork", "prohibited",
                  "city", "country", "county", "day", "time", "either", "pg", "owner", "states", "united", "us", "reproduc", "reproduct", "word",
-                   "office", "official", "name", "unit", "file"]
+                   "office", "official", "name", "unit", "file", "permission", "january",
+                   "february", "march", "april", "may", "june", "july", "august", "september",
+                   "october", "november", "december"]
     
     fin_txt = [word for word in var.split() if word not in additional_sw]
     fin_txt = ' '.join(fin_txt)
@@ -94,7 +138,7 @@ def word_cloud_save(table, pic_name, numbers_of_words):
     plt.figure()
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
-    plt.savefig(pic_name+".png")
+    plt.savefig(pic_name+".PNG")
     plt.show()
 
 def stem_fun(var):
@@ -117,7 +161,6 @@ def give_year_labels(df):
         ((df["year"] >= 1961) & (df["year"] <= 1980))]
     values = ['1851-1900', '1901-1930', '1931-1950', '1951-1960', '1961-1980']
     df['label'] = np.select(conditions, values)
-    df["num_tokens"] = df["clean_sw_dict_stem"].apply(lambda x: len(x.split(" ")))
     
     return df
 
@@ -157,7 +200,7 @@ def extract_embeddings_pre(df_in, num_vec_in, path_in, filename):
     import pickle
     my_model = KeyedVectors.load_word2vec_format(filename, binary=True) 
     my_model = Word2Vec(df_in.str.split(),
-                        min_count=1, vector_size=num_vec_in)#size=300)
+                        min_count=5, vector_size=num_vec_in)#size=300)
     #word_dict = my_model.wv.key_to_index
     #my_model.similarity("trout", "fish")
     def get_score(var):
@@ -191,8 +234,8 @@ def extract_embeddings_domain(df_in, num_vec_in, path_in, filename, sg):
     #import pickle
 
     model = Word2Vec(
-        df_in.str.split(), min_count=1,
-        vector_size=num_vec_in, workers=3, window=5, sg=sg)
+        df_in.str.split(), min_count=5, seed = 123,
+        vector_size=num_vec_in, workers=1, window=5, sg=sg)
     #wrd_dict = model.wv.key_to_index
     #model.wv.most_similar('machine', topn=10)
     # def get_score(var):
@@ -298,34 +341,23 @@ def display_pca_scatterplot(model, words=None, sample=0):
         plt.text(x+0.05, y+0.05, word)
 
 
-def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google_background = False, sg = 0):
+def word2vec_visual_hamilton(keyword, column_used, topn_number, filename, google_background = False, sg = 0):
     the_path = "C:/Users/tosea/NYT_API/"
     import pickle
     import numpy as np
     topn_number = topn_number
-    if stem == True:
-        model_1851_1900  = pickle.load(open(
-            the_path + f"clean_sw_dict_stem_1851_1900_embeddings_domain_model{sg}.pkl", 'rb'))
-        model_1901_1930  = pickle.load(open(
-            the_path + f"clean_sw_dict_stem_1901_1930_embeddings_domain_model{sg}.pkl", 'rb'))
-        model_1931_1950  = pickle.load(open(
-            the_path + f"clean_sw_dict_stem_1931_1950_embeddings_domain_model{sg}.pkl", 'rb'))
-        model_1951_1960  = pickle.load(open(
-            the_path + f"clean_sw_dict_stem_1951_1960_embeddings_domain_model{sg}.pkl", 'rb'))
-        model_1961_1980  = pickle.load(open(
-            the_path + f"clean_sw_dict_stem_1961_1980_embeddings_domain_model{sg}.pkl", 'rb'))
-    else:
-        model_1851_1900  = pickle.load(open(
-            the_path + f"clean_sw_dict_1851_1900_embeddings_domain_model{sg}.pkl", 'rb'))
-        model_1901_1930  = pickle.load(open(
-            the_path + f"clean_sw_dict_1901_1930_embeddings_domain_model{sg}.pkl", 'rb'))
-        model_1931_1950  = pickle.load(open(
-            the_path + f"clean_sw_dict_1931_1950_embeddings_domain_model{sg}.pkl", 'rb'))
-        model_1951_1960  = pickle.load(open(
-            the_path + f"clean_sw_dict_1951_1960_embeddings_domain_model{sg}.pkl", 'rb'))
-        model_1961_1980  = pickle.load(open(
-            the_path + f"clean_sw_dict_1961_1980_embeddings_domain_model{sg}.pkl", 'rb'))
-    
+
+    model_1851_1900  = pickle.load(open(
+        the_path + f"{column_used}_1851_1900_embeddings_domain_model{sg}.pkl", 'rb'))
+    model_1901_1930  = pickle.load(open(
+        the_path + f"{column_used}_1901_1930_embeddings_domain_model{sg}.pkl", 'rb'))
+    model_1931_1950  = pickle.load(open(
+        the_path + f"{column_used}_1931_1950_embeddings_domain_model{sg}.pkl", 'rb'))
+    model_1951_1960  = pickle.load(open(
+        the_path + f"{column_used}_1951_1960_embeddings_domain_model{sg}.pkl", 'rb'))
+    model_1961_1980  = pickle.load(open(
+        the_path + f"{column_used}_1961_1980_embeddings_domain_model{sg}.pkl", 'rb'))
+
     models = [model_1851_1900, model_1901_1930, 
               model_1931_1950, model_1951_1960,
               model_1961_1980]
@@ -626,40 +658,26 @@ def word2vec_visual_hamilton(keyword, topn_number, filename, stem = True, google
     
     
     plot_figure = go.Figure(data = data, layout = layout)
-    plot_figure.write_image(filename+str(sg)+".png")
+    plot_figure.write_image(filename+str(sg)+".PNG")
     plot_figure.show()
 
-def word2vec_visual_cluster(keyword, topn_number, filename, stem = True, sg = 0):
+def word2vec_visual_cluster(keyword, column_used, topn_number, filename, sg = 0):
     import numpy as np
     import pickle
     the_path = "C:/Users/tosea/NYT_API/"
     topn_number = topn_number
     topn = topn_number
-    if stem == True:
-        model_1851_1900  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1851_1900_embeddings_domain_model.pkl", 'rb'))
-        model_1901_1930  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1901_1930_embeddings_domain_model.pkl", 'rb'))
-        model_1931_1950  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1931_1950_embeddings_domain_model.pkl", 'rb'))
-        model_1951_1960  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1951_1960_embeddings_domain_model.pkl", 'rb'))
-        model_1961_1980  = pickle.load(open(
-            the_path + "clean_sw_dict_stem_1961_1980_embeddings_domain_model.pkl", 'rb'))
-    
-    else:
-        model_1851_1900  = pickle.load(open(
-            the_path + "clean_sw_dict_1851_1900_embeddings_domain_model.pkl", 'rb'))
-        model_1901_1930  = pickle.load(open(
-            the_path + "clean_sw_dict_1901_1930_embeddings_domain_model.pkl", 'rb'))
-        model_1931_1950  = pickle.load(open(
-            the_path + "clean_sw_dict_1931_1950_embeddings_domain_model.pkl", 'rb'))
-        model_1951_1960  = pickle.load(open(
-            the_path + "clean_sw_dict_1951_1960_embeddings_domain_model.pkl", 'rb'))
-        model_1961_1980  = pickle.load(open(
-            the_path + "clean_sw_dict_1961_1980_embeddings_domain_model.pkl", 'rb'))
-    
-    
+    model_1851_1900  = pickle.load(open(
+        the_path + f"{column_used}_1851_1900_embeddings_domain_model.pkl", 'rb'))
+    model_1901_1930  = pickle.load(open(
+        the_path + f"{column_used}_1901_1930_embeddings_domain_model.pkl", 'rb'))
+    model_1931_1950  = pickle.load(open(
+        the_path + f"{column_used}_1931_1950_embeddings_domain_model.pkl", 'rb'))
+    model_1951_1960  = pickle.load(open(
+        the_path + f"{column_used}_1951_1960_embeddings_domain_model.pkl", 'rb'))
+    model_1961_1980  = pickle.load(open(
+        the_path + f"{column_used}_1961_1980_embeddings_domain_model.pkl", 'rb'))
+
     models = [model_1851_1900, model_1901_1930, 
               model_1931_1950, model_1951_1960,
               model_1961_1980]
@@ -787,7 +805,7 @@ def word2vec_visual_cluster(keyword, topn_number, filename, stem = True, sg = 0)
     
     
     plot_figure = go.Figure(data = data, layout = layout)
-    plot_figure.write_image(filename+str(sg)+".png")
+    plot_figure.write_image(filename+str(sg)+".PNG")
     plot_figure.show()
     
     
@@ -816,5 +834,80 @@ def score_text(sample_text_i, the_path_i):
     print ("sample_text predicted as", the_pred[0],
            "with likelihood of", the_pred_proba)
     return the_pred, the_pred_proba
+
+def top_similar_words(df, column_used, start_year, end_year, keyword, the_path, sg = 0):
+    #sg = 1: skip-gram model
+    #sg = 0: CBOW model
+    the_path = "C:/Users/tosea/NYT_API/"
+    import pandas as pd
+    from nltk.stem.porter import PorterStemmer
+    import pickle
+    stemmer = PorterStemmer()
+    stm_keyword = stemmer.stem(keyword)
+    my_pd_sub = df[(start_year <= df.year) & (df.year <= end_year)]
+    stem_model = extract_embeddings_domain(
+        my_pd_sub[column_used], 300, the_path, f"{column_used}_{start_year}_{end_year}", sg)
+    pickle.dump(stem_model, open(the_path + f"{column_used}_{start_year}_{end_year}_embeddings_domain_model{sg}.pkl", "wb"))
+    stem_top_words_values = pd.DataFrame(
+        [i for i in stem_model.wv.most_similar(stm_keyword, topn=500)],
+        columns =[f'{stm_keyword}_stm', f'{stm_keyword}_Values_stm'])
+
+    return stem_top_words_values
+
+
+def get_mean_from_boot(my_pd, column_used, start_year, end_year, 
+                       keyword, the_path, sg, times_of_boot = 100, top_n = 250):
+    import pandas as pd
+    list1 = []
+    while times_of_boot != 0:
+        list1.append(top_similar_words(my_pd, column_used, start_year, end_year, keyword, the_path, sg))
+        times_of_boot -= 1
+    df = pd.concat(list1).groupby("terrorist_stm").mean()
+    if sg == 0:
+        df["Years"] = f"{start_year}-{end_year} CBOW"
+    if sg == 1:
+        df["Years"] = f"{start_year}-{end_year} SKNG"
+    return df.sort_values(by = ["terrorist_Values_stm"], ascending=False).reset_index()#.head(top_n)
+    
+
+
+
+def cal_jaccard_similarity(total_similar_word_list):
+    import numpy as np
+    import pandas as pd
+    years = ["Y1851_1900", "Y1901_1930", "Y1931_1950", "Y1951_1960", "Y1961_1980"]
+    jac_data = []
+    for i in range(len(total_similar_word_list)):
+        list1 = []
+        for j in range(len(total_similar_word_list)):
+            
+            if i < j:
+                j_score = np.nan
+            if i == j: j_score = 1
+            if i > j:
+                j_score = jaccard_fun(total_similar_word_list[i], 
+                                  total_similar_word_list[j])
+            list1.append(j_score)
+        jac_data.append(list1)
+        jac_table = pd.DataFrame(jac_data, columns= years)
+    
+    return jac_table
+
+def cal_tf_idf_cosine_similarity(total_similar_words_list):
+    import pandas as pd
+    import numpy as np
+    from sklearn.metrics.pairwise import cosine_similarity
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    years = ["Y1851_1900", "Y1901_1930", "Y1931_1950", "Y1951_1960", "Y1961_1980"]
+    # Initialize an instance of tf-idf Vectorizer
+    tfidf_vectorizer = TfidfVectorizer()
+    
+    # Generate the tf-idf vectors for the corpus
+    tfidf_matrix = tfidf_vectorizer.fit_transform(total_similar_words_list)
+    
+    # compute and print the cosine similarity matrix
+    cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+    tf_idf_table = pd.DataFrame(pd.np.tril(cosine_sim), columns = years).replace(0, np.nan)
+    return tf_idf_table
 
 
