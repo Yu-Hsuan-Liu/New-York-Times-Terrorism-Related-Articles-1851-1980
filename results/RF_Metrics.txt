@@ -1,0 +1,1 @@
+Weighted Precision: 0.6711, Weighted Recall: 0.6711, Weighted F1: 0.6660, Macro F1: 0.6659, Best params: gini/None/100

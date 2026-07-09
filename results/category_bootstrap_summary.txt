@@ -1,0 +1,15 @@
+Category-level bootstrap, 1851-1900, CBOW small params, B=50
+
+Target 'terrorism' (50/50 replicates with target in vocab):
+  any klan-variant in top-25:          0.10
+  any racial/electoral token in top25: 0.88
+  mean # racial/electoral in top-25:   2.62
+  any state-terror token in top-25:    0.10
+  mean # state-terror in top-25:       0.10
+
+Target 'terrorist' (50/50 replicates with target in vocab):
+  any klan-variant in top-25:          0.02
+  any racial/electoral token in top25: 0.56
+  mean # racial/electoral in top-25:   0.86
+  any state-terror token in top-25:    0.84
+  mean # state-terror in top-25:       1.34

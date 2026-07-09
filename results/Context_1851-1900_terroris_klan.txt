@@ -1,0 +1,42 @@
+--- Analysis Report: terroris near klan (1851-1900) ---
+
+Match #1 (Row 159)
+Distance: 22 words
+Context: ... tennessee militia muster penn dress eye amend militia guard **TERRORIST** exist count tie color whip_shot hung locality nightly attack home night fear condemn wrested officer jail militia attend speedy cessation outrage **KLAN** disappear magic militia set disaffect restore mind send terror heart evildoer notorious **KLAN** militia accomplished_mission disband send home subject ba governor discretion full retain ...
+--------------------------------------------------
+Match #2 (Row 218)
+Distance: 1 words
+Context: ... claim majority democrats pretend majority proportion differ speculation arise partly thousand vote_cast war democrats assume heretofore sullenly abstain participate politic trustworthy portion heretofore keep pull **TERRORIST** **KLAN** restore energy wisdom grant vote ticket fifth_district especially hundred registry_list sentiment conceal election war admit absolutely free election war democrats permit coerce voter gang ...
+--------------------------------------------------
+Match #3 (Row 219)
+Distance: 1 words
+Context: ... thousand become_familiar fully twelve_thousand majority republican_ticket freely expectation record desperate canvass democrat_republican majority certainly twenty_thousand otherwise majority increase vote largely compose heretofore stay polish consequence **TERRORIST** **KLAN** exception republican stuff hero mere_fact democrat active noisy frighten voting although convinced vote accordance political belief danger earnestness southern democrat exactly bluster bus pass ...
+--------------------------------------------------
+Match #4 (Row 220)
+Distance: 17 words
+Context: ... restrain difficult_task election impossible_precisely result follow election attend seymour forcibly portray horror event bring democratic_candidate nomination deem evidence republican_party consequent destruction attend evil result embolden **KLAN** hope success show_sign exhibit broken enforcement **KLAN** election free occur war true result extent determine **KLAN** **TERRORIST** republicans vote least swell chatham muslin perhaps localitie democrats everywhere mean prevent full republican vote legitimate tt undoubtedly lead scene violence prevent full republican ...
+--------------------------------------------------
+Match #5 (Row 221)
+Distance: 25 words
+Context: ... claim liberal carry north_carolina indicate importance success election_campaign candidate nomination suppose ability carry south aid negro vote surprise discover freedman induce follow example pass sell **KLAN** democracy fail negroes betrayal freedom liberal resorted intimidation_fraud north_carolina past especially morning tactic resort wholesale_scale widespread system challenge vote republican keep poll game_play systematic **TERRORIST** force keep freedmen polish election compel vote democratic_ticket consistent ally liberalism **KLAN** bands emerge murder commit muslin chatham opponent foretaste store whatever outrage_perpetrate aid ...
+--------------------------------------------------
+Match #6 (Row 225)
+Distance: 4 words
+Context: ... legislature democratic election require production receipt condition precedent voting provision intend cut negro vote negro likely tax_receipt previous obtain duplicate democratic election operation law_enforcement fourteenth_amendment **KLAN** free fear punishment **TERRORIST** except entirely free paved scheme disfranchisement boldly carry number savannah provide vote thousand building poll surround armed democrats road patrol democratic sabre club operate ...
+--------------------------------------------------
+Match #7 (Row 232)
+Distance: 26 words
+Context: ... ego district sort byron keep district morning district jamestown keep judicial republican_convention follow fourth district saratoga fifth_district stick keep seventh_district rochester prominent citizen cincinnati spend **KLAN** region kentucky discover learn safe testimony cautiously certainly apparent_reason louisville democratic paper signify indeed process half correspondent anything err_side moderation citizen wen franklin henry afraid **TERRORIST** establish band murderer_thief testimony freely undeservedly soothe specific instance deny moreover challenge denial newton tooth california prominence reason result election effect political nature native ...
+--------------------------------------------------
+Match #8 (Row 237)
+Distance: 11 words
+Context: ... finish white step platform drawing knife color white determine permit negro church fire color per_son kill receive afternoon dastardly outrage precede perpetrate alabama gang white **KLAN** provocation kind deliberately fire colored church kill jesus oration system **TERRORIST** alabama existence trustworthy witness arrive within political murder texas chairman republican central texas washington political murder commit texas joke governor southern address letter within ...
+--------------------------------------------------
+Match #9 (Row 248)
+Distance: 36 words
+Context: ... thank kind reception pledge merely elect cf governor discharge_duty fidelity applause senator frederick orator introduce rebellion sometimes doubt duly protect black south white institute system **TERRORIST** purpose drive colored exercise_right citizen unless decree lay constitutional_amendment enforce exchange slavery master protect big vassal color_race multiply_rapidly hence policy prudence require enlightenment education degradation social_equality touch social_equality free commerce preservation require suppression white leagues **KLAN_PLAN** declare favor protection vindicate wisdom england free_trade starve subject indie allow manufacture oh produce feed english factory air plea corruption judiciary haul politic candidate ...
+--------------------------------------------------
+Match #10 (Row 255)
+Distance: 49 words
+Context: ... white league_club parish soto pledge circumstance election employ rest land manner aid_comfort credit white_black vote nominee white individual express_opinion relate portion exist opinion favor principle **KLAN** white league organ_nation judge eyes parish judge parish arrival reach alive oblige leave home stealth nightfall lock_ark memphis father lie point death village unable visit fear assassination ho isa native parish prescribe political sentiment true misgovernment probable bad exist result armed organization crystallize white league instead bad develop **TERRORIST** prevent considerable_extent collection texas th punishment criminal vitiate send ascribe chief thee scene engage comply evidence detailed subject bat obtain_requisite data cover occur throughout ...
+--------------------------------------------------

@@ -1,0 +1,14 @@
+--- Analysis Report: terroris near night_rider (1901-1930) ---
+
+Match #1 (Row 952)
+Distance: 9 words
+Context: ... maids air_force ear defenseless town france england belgium hospital mark fond fighting bone military diplomatic_observer german protest ally german protest address probably sub_jest campaign air **TERRORIST** conduct enemy vital behind line france comb german **NIGHT_RIDER** regard german authority force step clamor german civil population particularly rhine_province belief mighty air_fleet build destroy town ...
+--------------------------------------------------
+Match #2 (Row 1152)
+Distance: 16 words
+Context: ... **NIGHT_RIDER** raid spread south **NIGHT_RIDER** raid spread south dinner farmer_merchant warn cotton negro klan drop debts **TERRORIST** demoralize business special atlanta campaign force close cotton cannery price step advance cent_pound assume_proportion economic section gravely_menace atlanta district include georgia_alabama south_carolina florida post ...
+--------------------------------------------------
+Match #3 (Row 1564)
+Distance: 9 words
+Context: ... ohio klan create **TERRORISM** witness war ohio klan create **TERRORISM** witness indianapolis **NIGHT_RIDER** carry shipping connect national_guard heir rifle assert adjutant_general series indianapoli **TERRORIST** allege_committed klan_plan ohio secret closely_associate relate attorney_general arthur james damsel ratio testimony deposition ...
+--------------------------------------------------
