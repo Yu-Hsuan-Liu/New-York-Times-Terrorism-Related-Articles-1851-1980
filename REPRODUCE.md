@@ -71,7 +71,7 @@ The corpus is filtered to articles whose full text contains "terrorism" or "terr
 | `nyt_main_training.py` (Word2Vec section) | `FINAL_ALL_MODELS_RESULTS.csv` | Table 3 neighbor ranks; CBOW + Skip-Gram per period; tiered hyperparameters; `seed=123` |
 | `run_temporal_alignment.py` | `Procrustes_Displacement_Results.csv`, `Procrustes_Alignment_Summary.txt` | Temporal Stability Check (0.619 / 0.322 / 0.457 / 0.153); Table S8, Figure S5 |
 | `w2v_robustness_check.py` | `W2V_Robustness_Comparison.csv`, `W2V_Robustness_Summary.txt` | Uniform min_count=5 robustness / Jaccard overlap; Table S7 |
-| `w2v_klan_sensitivity.py`, `verify_w2v_clean.py` | — | Klan sensitivity checks |
+| `w2v_klan_sensitivity.py` | — | Klan sensitivity checks |
 | `make_w2v_visualization.py` | figure | Figure 1 (semantic-proximity heatmap) |
 
 **Hyperparameter tiers (by corpus size):** small (<1,000 docs) `vector_size=50, window=3, epochs=50, min_count=3`;
